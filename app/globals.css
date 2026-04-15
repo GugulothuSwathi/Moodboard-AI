@@ -1,0 +1,191 @@
+/* app/globals.css */
+/* Tailwind's three directive layers — REQUIRED */
+@tailwind base;       /* Reset styles (removes browser defaults) */
+@tailwind components; /* Reusable component classes */
+@tailwind utilities;  /* All the utility classes like bg-red-500, text-xl, etc. */
+
+/* =============================================
+   CUSTOM BASE STYLES
+   ============================================= */
+@layer base {
+  /* Smooth scrolling for the whole page */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Better font rendering on Mac */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Selection color — what you see when you highlight text */
+  ::selection {
+    background-color: #d946ef;
+    color: white;
+  }
+}
+
+/* =============================================
+   CUSTOM COMPONENT CLASSES
+   These are reusable patterns we can apply like: className="btn-primary"
+   ============================================= */
+@layer components {
+  /* Primary button style */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 
+           px-6 py-3 rounded-2xl font-body font-medium
+           bg-gradient-to-r from-brand-500 to-purple-600
+           text-white shadow-lg shadow-brand-500/25
+           hover:shadow-xl hover:shadow-brand-500/40
+           hover:-translate-y-0.5
+           active:translate-y-0 active:shadow-md
+           transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
+  }
+
+  /* Secondary/ghost button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-6 py-3 rounded-2xl font-body font-medium
+           border border-gray-200 dark:border-gray-700
+           text-gray-700 dark:text-gray-300
+           hover:bg-gray-50 dark:hover:bg-gray-800
+           hover:border-gray-300 dark:hover:border-gray-600
+           transition-all duration-200;
+  }
+
+  /* Glass morphism card — the frosted glass effect */
+  .glass-card {
+    @apply bg-white/80 dark:bg-gray-900/80 
+           backdrop-blur-sm
+           border border-gray-100 dark:border-gray-800
+           rounded-3xl shadow-sm;
+  }
+
+  /* Shimmer loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-gray-100 dark:bg-gray-800 rounded-xl;
+  }
+
+  /* Gradient text — beautiful for headings */
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-500 via-purple-500 to-indigo-500
+           bg-clip-text text-transparent;
+  }
+
+  /* Reusable form field input */
+  .field-input {
+    @apply w-full px-3 py-2.5 rounded-xl text-sm
+           bg-gray-50 dark:bg-gray-900
+           border border-gray-200 dark:border-gray-700
+           text-gray-900 dark:text-gray-100
+           placeholder:text-gray-400 dark:placeholder:text-gray-600
+           focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500
+           transition-all duration-150;
+  }
+}
+
+/* =============================================
+   LOADING SHIMMER ANIMATION
+   Used for loading placeholders
+   ============================================= */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* =============================================
+   CUSTOM SCROLLBAR (WebKit browsers: Chrome, Edge, Safari)
+   ============================================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #374151;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* =============================================
+   MOOD BOARD SPECIFIC STYLES
+   ============================================= */
+
+/* Staggered animation for board elements appearing */
+.board-item {
+  opacity: 0;
+  animation: fadeUp 0.5s ease-out forwards;
+}
+
+.export-mode .board-item {
+  opacity: 1 !important;
+  animation: none !important;
+  transform: none !important;
+}
+
+.export-mode .glass-card {
+  backdrop-filter: none !important;
+  background-color: #ffffff !important;
+}
+.dark .export-mode .glass-card {
+  background-color: #111827 !important;
+}
+
+.board-item:nth-child(1) { animation-delay: 0.05s; }
+.board-item:nth-child(2) { animation-delay: 0.10s; }
+.board-item:nth-child(3) { animation-delay: 0.15s; }
+.board-item:nth-child(4) { animation-delay: 0.20s; }
+.board-item:nth-child(5) { animation-delay: 0.25s; }
+.board-item:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Font preview card — shows actual font in use */
+.font-preview-heading {
+  font-family: var(--preview-font, inherit);
+}
+
+/* Color swatch hover expand */
+.color-swatch {
+  transition: flex 0.3s ease;
+}
+.color-swatch:hover {
+  flex: 2;
+}

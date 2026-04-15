@@ -1,0 +1,205 @@
+'use client'
+
+import { useState, useEffect } from 'react';
+import { Sparkles, Palette, Type, Image as ImageIcon, Tag } from 'lucide-react';
+import PromptInput from '../components/PromptInput';
+import MoodBoard from '../components/MoodBoard';
+import SplashScreen from '../components/SplashScreen';
+import { experimental_useObject as useObject } from '@ai-sdk/react';
+import { z } from 'zod';
+
+const EXAMPLE_PROMPTS = [
+  "minimalist Japanese tea house at sunrise",
+  "futuristic neon cyberpunk city at night",
+  "cozy autumn cabin in the forest",
+  "luxurious Art Deco hotel lobby",
+  "bohemian desert wedding in Morocco",
+  "brutalist concrete architecture",
+];
+
+const moodboardSchema = z.object({
+  colors: z.array(z.object({
+    hex: z.string(),
+    name: z.string(),
+    emotion: z.string()
+  })).length(6),
+  fonts: z.array(z.object({
+    name: z.string(),
+    role: z.string(),
+    reason: z.string()
+  })).length(3),
+  keywords: z.array(z.string()).length(8),
+  textures: z.array(z.string()).length(4),
+  imageSearchTerms: z.array(z.string()).length(5),
+  designDirection: z.string()
+});
+
+export default function HomePage() {
+  const [unsplashImages, setUnsplashImages] = useState([]);
+  const [boardError, setBoardError] = useState(null);
+  const [currentPrompt, setCurrentPrompt] = useState('');
+  const [showSplash, setShowSplash] = useState(true);
+  const [hasFetchedImages, setHasFetchedImages] = useState(false);
+
+  const { object, submit, isLoading, error } = useObject({
+    api: '/api/generate',
+    schema: moodboardSchema
+  });
+
+  useEffect(() => {
+    const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');
+    if (hasSeenSplash) setShowSplash(false);
+  }, []);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    sessionStorage.setItem('hasSeenSplash', 'true');
+  };
+
+  const handleGenerate = async (prompt) => {
+    if (!prompt.trim()) return;
+    setBoardError(null);
+    setCurrentPrompt(prompt);
+    setUnsplashImages([]);
+    setHasFetchedImages(false);
+    
+    submit({ prompt });
+
+    setTimeout(() => {
+      document.getElementById('board-section')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }, 100);
+  };
+
+  useEffect(() => {
+    // When the stream gives us all 5 search terms, trigger Unsplash exactly once.
+    if (
+      object?.imageSearchTerms && 
+      object.imageSearchTerms.length >= 5 && 
+      !hasFetchedImages
+    ) {
+      setHasFetchedImages(true);
+      fetch('/api/unsplash', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ searchTerms: object.imageSearchTerms })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setUnsplashImages(data);
+        }
+      })
+      .catch(err => console.error("Failed to fetch unsplash images:", err));
+    }
+  }, [object?.imageSearchTerms, hasFetchedImages]);
+
+  // Combine the streamed object with the resolved Unsplash Images
+  const boardData = object ? { ...object, images: unsplashImages } : null;
+  const isActuallyLoading = isLoading || (object && !hasFetchedImages);
+
+  return (
+    <>
+      {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+
+      <div className={`transition-opacity duration-1000 ${showSplash ? 'opacity-0 h-screen overflow-hidden' : 'opacity-100'}`}>
+        
+      <section className="relative min-h-screen flex flex-col items-center justify-center pt-16 pb-12 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-300/20 dark:bg-brand-800/20 rounded-full blur-3xl" />
+          <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-purple-300/15 dark:bg-purple-800/15 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-indigo-300/10 dark:bg-indigo-800/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 dark:bg-brand-950/50 border border-brand-200 dark:border-brand-800 text-brand-600 dark:text-brand-400 text-sm font-medium mb-8 animate-fade-in">
+            <Sparkles size={14} />
+            AI-Powered Creative Tool
+          </div>
+
+          <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-semibold leading-tight mb-6 animate-fade-up">
+            Turn any idea into a{' '}
+            <span className="gradient-text italic">mood board</span>{' '}
+            in seconds
+          </h1>
+
+          <p className="font-body text-lg sm:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-4 animate-fade-up" style={{ animationDelay: '0.1s' }}>
+            Type a creative concept — get colors, fonts, keywords, textures, and real reference photos. 
+            All generated by AI, beautifully arranged.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-3 mb-12 animate-fade-up" style={{ animationDelay: '0.15s' }}>
+            {[
+              { icon: Palette, label: 'Color Palettes' },
+              { icon: Type, label: 'Font Pairings' },
+              { icon: ImageIcon, label: 'Reference Photos' },
+              { icon: Tag, label: 'Mood Keywords' },
+            ].map(({ icon: Icon, label }) => (
+              <span key={label} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full text-sm">
+                <Icon size={13} />
+                {label}
+              </span>
+            ))}
+          </div>
+
+          <div className="animate-fade-up" style={{ animationDelay: '0.2s' }}>
+            <PromptInput
+              onGenerate={handleGenerate}
+              isLoading={isLoading}
+            />
+          </div>
+
+          <div className="mt-6 animate-fade-up" style={{ animationDelay: '0.25s' }}>
+            <p className="text-xs text-gray-400 dark:text-gray-600 mb-3 uppercase tracking-widest">
+              Try these
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {EXAMPLE_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  onClick={() => handleGenerate(prompt)}
+                  disabled={isLoading}
+                  className="text-sm px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-brand-300 dark:hover:border-brand-700 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/30 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="board-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+
+        {(error || boardError) && (
+          <div className="max-w-2xl mx-auto mb-8 p-4 rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm text-center animate-fade-in">
+            ⚠️ {error?.message || boardError} — Please try again.
+          </div>
+        )}
+
+        {(boardData || isLoading) && (
+          <MoodBoard
+            data={boardData}
+            prompt={currentPrompt}
+            isLoading={isLoading && !object}
+          />
+        )}
+
+        {!boardData && !isLoading && !error && !boardError && (
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gray-100 dark:bg-gray-800 mb-6">
+              <Sparkles size={32} className="text-gray-400 dark:text-gray-600" />
+            </div>
+            <p className="text-gray-400 dark:text-gray-600 text-lg font-display italic">
+              Your mood board will appear here...
+            </p>
+          </div>
+        )}
+      </section>
+      </div>
+    </>
+  );
+}
