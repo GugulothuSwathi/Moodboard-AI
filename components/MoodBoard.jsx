@@ -47,7 +47,9 @@ export default function MoodBoard({ data, prompt, isLoading }) {
   const [copied, setCopied] = useState(false);
   const [exporting, setExporting] = useState(false);
   
+  
   const boardRef = useRef(null);
+  const [sharing, setSharing] = useState(false);
 
   if (isLoading) return <MoodBoardSkeleton />;
   if (!data) return null;
@@ -80,7 +82,6 @@ export default function MoodBoard({ data, prompt, isLoading }) {
     }
   };
 
-  const [sharing, setSharing] = useState(false);
 
   const handleShare = async () => {
     if (!shareUrl) {
@@ -95,17 +96,21 @@ export default function MoodBoard({ data, prompt, isLoading }) {
       try {
         const element = boardRef.current;
         const originalScroll = window.scrollY;
+        const originalWidth = element.style.width;
+        
         window.scrollTo(0, 0);
         document.body.classList.add('export-mode');
+        element.style.width = '1200px'; // Force desktop layout for export
 
         const canvas = await html2canvas(element, { 
-          scale: 2, 
+          scale: 3, 
           useCORS: true, 
           allowTaint: true,
           scrollY: 0,
           backgroundColor: document.documentElement.classList.contains('dark') ? '#030712' : '#ffffff' 
         });
 
+        element.style.width = originalWidth;
         document.body.classList.remove('export-mode');
         window.scrollTo(0, originalScroll);
 
@@ -158,17 +163,21 @@ export default function MoodBoard({ data, prompt, isLoading }) {
       const element = boardRef.current;
       
       const originalScroll = window.scrollY;
+      const originalWidth = element.style.width;
+
       window.scrollTo(0, 0);
       document.body.classList.add('export-mode');
+      element.style.width = '1200px'; // Force wide desktop layout for professional PDF
 
       const canvas = await html2canvas(element, { 
-        scale: 2, 
+        scale: 3, 
         useCORS: true, 
         allowTaint: true,
         scrollY: 0,
         backgroundColor: document.documentElement.classList.contains('dark') ? '#030712' : '#ffffff' 
       });
       
+      element.style.width = originalWidth;
       document.body.classList.remove('export-mode');
       window.scrollTo(0, originalScroll);
 
@@ -258,8 +267,8 @@ export default function MoodBoard({ data, prompt, isLoading }) {
           <div className="board-item glass-card p-6 min-h-[160px]">
              <SectionLabel>Mood & Keywords</SectionLabel>
              <div className="flex flex-wrap gap-2 mt-4">
-               {keywords?.map((keyword, i) => {
-                 const color = colors?.[i % colors.length]?.hex || '#6b7280';
+                {keywords?.map((keyword, i) => {
+                  const color = (colors && colors.length > 0) ? colors[i % colors.length]?.hex : '#6b7280';
                  return (
                  <span
                    key={`${keyword}-${i}`}
@@ -283,7 +292,7 @@ export default function MoodBoard({ data, prompt, isLoading }) {
                 <li key={`${texture}-${i}`} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
                   <div
                     className="w-3 h-3 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: colors?.[i % colors.length]?.hex || '#d1d5db' }}
+                    style={{ backgroundColor: (colors && colors.length > 0) ? colors[i % colors.length]?.hex : '#d1d5db' }}
                   />
                   {texture}
                 </li>

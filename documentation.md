@@ -14,7 +14,7 @@ The frontend is built on **React** combined with **Next.js 14**. It predominantl
 The backend leverages Next.js API Routes operating on a Node.js edge-like runtime logic. 
 - **Endpoint Structure**: Routes like `/api/generate` and `/api/boards` handle synchronous and asynchronous requests respectively.
 - **Parallel Processing**: Upon receiving a generative prompt, the application performs a dual-layered execution:
-  1. It asynchronously queries the **OpenAI API** for semantic outputs (JSON structuring covering color hex-codes, font pairings, and thematic tags).
+  1. It asynchronously queries the **Google Gemini API** for semantic outputs (JSON structuring covering color hex-codes, font pairings, and thematic tags).
   2. Simultaneously queries **Unsplash API** using conceptual tagging to fetch environmental representations.
 - Both data pipelines are awaited, merged, and structurally validated before yielding the consolidated object to the frontend state hook. 
 

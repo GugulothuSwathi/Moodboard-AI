@@ -22,15 +22,15 @@ const moodboardSchema = z.object({
     hex: z.string(),
     name: z.string(),
     emotion: z.string()
-  })).length(6),
+  })).min(1),
   fonts: z.array(z.object({
     name: z.string(),
     role: z.string(),
     reason: z.string()
-  })).length(3),
-  keywords: z.array(z.string()).length(8),
-  textures: z.array(z.string()).length(4),
-  imageSearchTerms: z.array(z.string()).length(5),
+  })).min(1),
+  keywords: z.array(z.string()).min(1),
+  textures: z.array(z.string()).min(1),
+  imageSearchTerms: z.array(z.string()).min(1),
   designDirection: z.string()
 });
 
@@ -45,6 +45,12 @@ export default function HomePage() {
     api: '/api/generate',
     schema: moodboardSchema
   });
+
+  useEffect(() => {
+    if (error) {
+      console.error("AI Generation Error:", error);
+    }
+  }, [error]);
 
   useEffect(() => {
     const hasSeenSplash = sessionStorage.getItem('hasSeenSplash');

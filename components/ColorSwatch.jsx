@@ -8,6 +8,8 @@ export default function ColorSwatch({ colors }) {
   const [copiedIndex, setCopiedIndex] = useState(null);
 
   if (!colors || colors.length === 0) return null;
+  const validColors = colors.filter(c => c && c.hex);
+  if (validColors.length === 0) return null;
 
   const copyHex = async (hex, index) => {
     await navigator.clipboard.writeText(hex);
@@ -17,13 +19,13 @@ export default function ColorSwatch({ colors }) {
 
   return (
     <div className="flex h-24 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800">
-      {colors.map((color, index) => (
+      {validColors.map((color, index) => (
         <button
-          key={color.hex}
+          key={`color-${index}`}
           onClick={() => copyHex(color.hex, index)}
           className="color-swatch flex-1 relative group flex flex-col items-center justify-end pb-2 cursor-pointer"
           style={{ backgroundColor: color.hex }}
-          title={`${color.name} — ${color.hex} (click to copy)`}
+          title={`${color.name || 'Color'} — ${color.hex} (click to copy)`}
         >
           {}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200 flex items-center justify-center">

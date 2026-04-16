@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
 export const maxDuration = 30;
+export const runtime = 'edge';
 
 export async function POST(req) {
   try {
@@ -17,8 +18,10 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Prompt too long (max 500 characters)' }, { status: 400 });
     }
 
+    const apiKey = process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    
     const google = createGoogleGenerativeAI({
-      apiKey: process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      apiKey: apiKey,
     });
 
     const result = await streamObject({
@@ -47,6 +50,7 @@ Make your suggestions specific, sophisticated, and genuinely useful for a design
 
     return result.toTextStreamResponse();
   } catch (error) {
+    console.error('API Error:', error);
     if (error?.message?.includes('RESOURCE_EXHAUSTED')) {
       return NextResponse.json({ error: 'AI service quota exhausted.' }, { status: 429 });
     }

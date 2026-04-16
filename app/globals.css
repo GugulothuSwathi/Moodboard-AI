@@ -154,9 +154,34 @@
 .export-mode .glass-card {
   backdrop-filter: none !important;
   background-color: #ffffff !important;
+  border-color: #e5e7eb !important;
+  box-shadow: none !important;
 }
+
 .dark .export-mode .glass-card {
   background-color: #111827 !important;
+  border-color: #374151 !important;
+}
+
+/* Ensure text is dark/clear in white background exports */
+.export-mode .text-gray-400,
+.export-mode .text-gray-600 {
+  color: #4b5563 !important;
+}
+
+.export-mode h2,
+.export-mode h3 {
+  color: #000000 !important;
+}
+
+.dark .export-mode h2,
+.dark .export-mode h3 {
+  color: #ffffff !important;
+}
+
+/* Fix for overlapping keywords in export */
+.export-mode .flex-wrap {
+  gap: 12px !important;
 }
 
 .board-item:nth-child(1) { animation-delay: 0.05s; }

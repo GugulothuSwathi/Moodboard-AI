@@ -40,7 +40,7 @@ npm install
 ### 3. Environment Configuration
 Create a `.env.local` file in the root directory and configure it as shown in `.env.local.example`:
 ```env
-OPENAI_API_KEY=your_openai_api_key
+GOOGLE_GENERATIVE_AI_API_KEY=your_google_gemini_api_key
 UNSPLASH_ACCESS_KEY=your_unsplash_access_key
 MONGODB_URI=your_mongodb_connection_string
 NEXTAUTH_SECRET=your_nextauth_random_secret
@@ -62,5 +62,5 @@ Navigate to `http://localhost:3000` to interact with the application.
 - **Authentication**: NextAuth.js (OAuth 2.0)
 - **Database**: MongoDB & Mongoose *(Note: MongoDB chosen over Firebase for complex nested schema relationships)*
 - **Icons**: Lucide React
-- **Generative AI Integration**: OpenAI (`gpt-4o-mini`)
+- **Generative AI Integration**: Google Gemini (`gemini-2.5-flash`)
 - **Image Assets**: Unsplash Image API
