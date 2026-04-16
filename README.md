@@ -1,5 +1,7 @@
 # MoodBoard AI 🎨
 
+**Live Demo:** [https://moodboard-ai-nine.vercel.app/](https://moodboard-ai-nine.vercel.app/)
+
 ![Homepage Screenshot](./screenshots/home.png)
 
 MoodBoard AI is a powerful, AI-driven creative application that instantly transforms text concepts into visually stunning, coherent mood boards. Designed for creatives, architects, event planners, and designers, MoodBoard AI accelerates the ideation phase by generating tailored color palettes, typography, conceptual keywords, and real-world reference imagery based on natural language descriptions.
@@ -62,5 +64,5 @@ Navigate to `http://localhost:3000` to interact with the application.
 - **Authentication**: NextAuth.js (OAuth 2.0)
 - **Database**: MongoDB & Mongoose *(Note: MongoDB chosen over Firebase for complex nested schema relationships)*
 - **Icons**: Lucide React
-- **Generative AI Integration**: Google Gemini (`gemini-2.5-flash`)
+- **Generative AI Integration**: Google Gemini (`gemini-flash-latest`)
 - **Image Assets**: Unsplash Image API
