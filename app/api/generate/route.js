@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { NextResponse } from 'next/server';
 
 export const maxDuration = 30;
-export const runtime = 'edge';
 
 export async function POST(req) {
   try {
@@ -20,12 +19,17 @@ export async function POST(req) {
 
     const apiKey = process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
     
+    if (!apiKey) {
+      console.error('SERVER ERROR: Missing Gemini API Key');
+      return NextResponse.json({ error: 'Server Configuration Error: Google Gemini API Key is missing in Vercel Environment Variables.' }, { status: 500 });
+    }
+
     const google = createGoogleGenerativeAI({
       apiKey: apiKey,
     });
 
     const result = await streamObject({
-      model: google('gemini-2.5-flash'),
+      model: google('gemini-flash-latest'),
       system: `You are a professional creative director and brand designer with expertise in visual aesthetics, color theory, and typography.
 Your task is to generate a complete mood board brief based on a creative concept.
 Make your suggestions specific, sophisticated, and genuinely useful for a designer.`,
